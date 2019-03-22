@@ -13,7 +13,11 @@ class App extends Component {
     this.state = {
       tasks: [],
       isDisplayForm: false,
-      taskEditing: null
+      taskEditing: null,
+      filter: {
+        name: '',
+        status: "0"
+      }
     };
 
     this.onShowNewForm = this.onShowNewForm.bind(this);
@@ -23,6 +27,7 @@ class App extends Component {
     this.handleDeleteTask = this.handleDeleteTask.bind(this);
     this.handleEditTask = this.handleEditTask.bind(this);
     this.updateEditTask = this.updateEditTask.bind(this);
+    this.handleFilter = this.handleFilter.bind(this);
   }
 
   componentWillMount() {
@@ -93,6 +98,15 @@ class App extends Component {
     });
   }
 
+  handleFilter(filter) {
+    this.setState({
+      filter: {
+        name: filter.filterName,
+        status: filter.filterStatus
+      }
+    })
+  }
+
   updateEditTask(updateTask) {
     if(updateTask.status === 'true') {
       updateTask.status = true;
@@ -111,7 +125,17 @@ class App extends Component {
   }
 
   render() {
-    let { tasks, isDisplayForm, taskEditing } = this.state;
+    let { tasks, isDisplayForm, taskEditing, filter } = this.state;
+    if(filter.name) {
+      tasks = tasks.filter(task => task.name.toLowerCase().indexOf(filter.name.toLowerCase()) !== -1);
+    }
+
+    if(filter.status === "1") {
+      tasks = tasks.filter(task => task.status === true);
+    } else if(filter.status === "-1") {
+      tasks = tasks.filter(task => task.status === false);
+    }
+
     let showNewForm = isDisplayForm ? <TaskForm
       onHideNewForm={this.onHideNewForm}
       getNewTask={this.getNewTask}
@@ -144,13 +168,14 @@ class App extends Component {
             {/** Search - Sort */}
             <div className="row mt-15">
               {/**Control */}
-              <Control></Control>
-            </div>
+            <Control></Control>
+            </div> 
             {/**List */}
             <TaskList tasks = {tasks}
               handleChangeStatus={this.handleChangeStatus}
               handleDeleteTask={this.handleDeleteTask}
               handleEditTask={this.handleEditTask}
+              handleFilter={this.handleFilter}
             />
           </div>
         </div>

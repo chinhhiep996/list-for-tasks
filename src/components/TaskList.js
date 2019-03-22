@@ -1,6 +1,7 @@
 import React from 'react';
 
 import TaskItem from './TaskItem';
+import { connect } from 'net';
 
 class TaskList extends React.Component {
   constructor(props) {
@@ -8,7 +9,7 @@ class TaskList extends React.Component {
 
     this.state = {
       filterName: '',
-      filterStatus: 0
+      filterStatus: "0"
     }
 
     this.handleChangeStatus = this.handleChangeStatus.bind(this);
@@ -29,17 +30,20 @@ class TaskList extends React.Component {
     this.props.handleEditTask(index);
   }
 
-  handleFilter(event) {
+  async handleFilter(event) {
     const target = event.target;
     const value = target.value;
     const name = target.name;
 
-    this.setState({
+    await this.setState({
       [name]: value
     });
+
+    this.props.handleFilter(this.state);
   }
 
   render() {
+    console.log(this.props.todos);
     let {tasks} = this.props;
     let {filterName, filterStatus} = this.state;
     let taskList = tasks.map((task, index) => {
@@ -81,9 +85,9 @@ class TaskList extends React.Component {
                     value={filterStatus}
                     onChange={this.handleFilter}
                   >
-                    <option value={0}>Tất cả</option>
-                    <option value={-1}>Ẩn</option>
-                    <option value={1}>Kích hoạt</option>
+                    <option value={'0'}>Tất cả</option>
+                    <option value={'-1'}>Ẩn</option>
+                    <option value={'1'}>Kích hoạt</option>
                   </select>
                 </td>
                 <td></td>
@@ -98,4 +102,13 @@ class TaskList extends React.Component {
   }
 }
 
-export default TaskList;
+const mapStateToProps = state => {
+  return {
+    tasks: state.tasks
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  null
+)(TaskList);
